@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Http\Services\PaymentService;
+use App\Services\PaymentService;
 use Illuminate\Console\Command;
 
 class PaymentSendCommand extends Command

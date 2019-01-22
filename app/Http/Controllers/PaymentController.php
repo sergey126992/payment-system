@@ -9,7 +9,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Payment\CreateRequest;
-use App\Http\Services\PaymentService;
+use App\Services\PaymentService;
 use App\Models\Payment;
 use Illuminate\Http\Response;
 
