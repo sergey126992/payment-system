@@ -8,27 +8,30 @@ class PaymentService
 {
     public function sendToService()
     {
-        $paymentsToSend = Payment::forSend()->getModels();
+        $pcntl_count = 5;
 
-        foreach ($paymentsToSend as $payment) {
-            $child_pid = pcntl_fork();
-            if ($child_pid == -1) {
-                die ("Can't fork process");
-            } elseif ($child_pid) {
-                $child_processes[] = $child_pid;
-                if ($i = count($paymentsToSend) - 1){
-                    foreach ($child_processes as $process_pid) {
-                        $status = 0;
-                        pcntl_waitpid($process_pid, $status);
+        Payment::forSend()->chunk($pcntl_count, function ($paymentsToSend) {
+
+            foreach ($paymentsToSend as $payment) {
+                $child_pid = pcntl_fork();
+                if ($child_pid == -1) {
+                    die ("Can't fork process");
+                } elseif ($child_pid) {
+                    $child_processes[] = $child_pid;
+                    if ($i = count($paymentsToSend) - 1){
+                        foreach ($child_processes as $process_pid) {
+                            $status = 0;
+                            pcntl_waitpid($process_pid, $status);
+                        }
                     }
-                }
-            } else {
-                $this->send();
-                $payment->setStatusSend();
+                } else {
+                    $this->send();
+                    $payment->setStatusSend();
 
-                exit(0);
+                    exit(0);
+                }
             }
-        }
+        });
     }
 
     public function updateStatus()
